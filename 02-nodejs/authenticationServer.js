@@ -30,8 +30,44 @@
  */
 
 const express = require("express")
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 const PORT = 3000;
 const app = express();
+app.use(bodyParser.json())
+const data =[]
+const passwordList=[]
 // write your logic here, DONT WRITE app.listen(3000) when you're running tests, the tests will automatically start the server
+app.post('/signup',(req,res)=>{
+  const {email,firstName,lastName,password} = req.body;
+  if (data.find((item)=>item.email===email)){
+    return res.status(400).send("Bad Request");
+  }
+  const user ={
+    id: data.length+1,
+    email,
+    firstName,
+    lastName,
+    password
+  }
+  data.push(user);
+  res.status(201).send("Signup successful");
+})
 
-module.exports = app;
+app.post('/login',(req,res)=>{
+  const {email,password} = req.body;
+  const user = data.find((item)=>(item.email===email&&item.password===password));
+  console.log(user);
+  if(!user){
+    return res.status(401).send("Unauthorized");
+  }
+  const secretKey = user.password;
+  const token = jwt.sign(user,secretKey);
+  res.status(200).json({token});
+
+})
+
+app.listen(PORT,()=>{
+  console.log('Server running');
+})
+//module.exports = app;

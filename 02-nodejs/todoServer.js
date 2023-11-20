@@ -44,6 +44,70 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+const todos =[]
+
 app.use(bodyParser.json());
+
+app.get('/todos',(req,res)=>{
+  res.status(200).json(todos);
+})
+
+app.get('/todos/:id',(req,res)=>{
+const todosId = parseInt(req.params.id);
+console.log(todosId);
+const todo = todos.find((item)=>item.id===todosId);
+if (todo){
+  res.status(200).json(todo);
+}
+else{
+  res.status(404).send("No Data Found");
+}
+})
+
+app.post('/todos',(req,res)=>{
+  const {title,description,completed} =req.body;
+  console.log(title,description);
+  if (!title || !description){
+    return res.status(401).send("Title or Description Not found");
+  }
+  const todo={
+    id: todos.length+1,
+    title,
+    description,
+    completed
+  };
+  todos.push(todo);
+  res.status(201).json(todo);
+})
+
+app.put('/todos/:id',(req,res)=>{
+  const todosId = parseInt(req.params.id);
+  const {title,description,completed} = req.body;
+  const todo = todos.find((item)=>item.id===todosId);
+  if (!todo){
+    return res.status(404).send("Not Found");
+  }
+  todo.title = title || todo.title;
+  todo.description = description || todo.description;
+  todo.completed = completed || todo.completed;
+  res.status(200).json(todo);
+})
+
+app.delete('/todos/:id',(req,res)=>{
+  const todosId = parseInt(req.params.id);
+  const updatedTodo = todos.filter((item)=>item.id!==todosId);
+  if(updatedTodo.length===todos.length){
+    return res.status(404).send("Todo Not Found");
+  }
+  todos.length=0;
+  todos.push(updatedTodo);
+  res.status(200).json(todos);
+})
+// const port = 3000;
+// app.listen(port, () => {
+//   console.log(`Server is running on port ${port}`);
+// });
+
+
 
 module.exports = app;

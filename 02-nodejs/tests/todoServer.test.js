@@ -24,6 +24,7 @@ describe('Todo API', () => {
   const todo = {
     title: 'New Todo',
     description: 'A new todo item',
+    completed: true
   };
 
   test('should create a new todo item', (done) => {
